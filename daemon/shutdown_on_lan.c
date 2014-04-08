@@ -11,8 +11,7 @@
 
 void wait_for_sol()
 {
-	// initialize the socket handles
-	//unsigned int socket_send = 0;
+	// initialize the socket handle
 	unsigned int socket_receive = 0;
 	char *msg_buf;
 	int msg_buf_len;
@@ -23,6 +22,7 @@ void wait_for_sol()
 	msg_buf_len = 103;	// 102 + 1 (magic packet + string terminating null)
 	//initialize the magic packet that is expected to be received
 	magic_packet = (char *)calloc(msg_buf_len, 1);
+
 	*((unsigned int *)magic_packet) = 0xffffffff;
 	*((unsigned int *)(magic_packet+4)) = 0xffff;
 	for ( i = 1; i < 17; i++ )

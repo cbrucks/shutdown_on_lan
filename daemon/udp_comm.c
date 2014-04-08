@@ -76,7 +76,7 @@ int terminate_udp_comm()
 int open_socket( unsigned int *s, unsigned int net_local_ip, unsigned short net_local_port )
 {
 	SOCKADDR_IN address;
-	unsigned long nonBlocking;
+	//unsigned long nonBlocking;
 
 	assert( !is_socket_open(s) );
 
