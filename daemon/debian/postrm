@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# This script removes the initscript system links to the services init.d file
+
+## Specifies the name of the executable installed by the package
+exefilename="sol"
+
+if [ "$1" = purge ]; then
+    update-rc.d "$exefilename" remove
+fi
+
+exit 0
