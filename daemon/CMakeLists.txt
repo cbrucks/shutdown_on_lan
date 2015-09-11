@@ -1,6 +1,6 @@
 ## Main cmake configuration file
 
-CMAKE_MINIMUM_REQUIRED(VERSION 3.3)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 ## Set the base name of the output for this project
 SET(OUTPUT_NAME sol)
 PROJECT(${OUTPUT_NAME})
