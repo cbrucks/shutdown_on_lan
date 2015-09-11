@@ -9,6 +9,8 @@
 #define MAC_WORD_5 0xbf
 #define MAC_WORD_6 0xa1
 
+#define PORT 19374
+
 void wait_for_sol()
 {
 	// initialize the socket handle
@@ -39,8 +41,8 @@ void wait_for_sol()
 	// initialize the socket interface
 	if ( !initialize_udp_comm() ) return;
 
-	// Create a socket to receive messages from port 25001 on any interface
-	if ( !open_socket( &socket_receive, 0, port_to_net(19374) ) ) return;
+	// Create a socket to receive messages on any interface
+	if ( !open_socket( &socket_receive, 0, port_to_net(PORT) ) ) return;
 
 	// Read the message
 	while ( 1 )
