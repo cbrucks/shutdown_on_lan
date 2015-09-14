@@ -80,7 +80,7 @@ void wait_for_sol()
                 {
                     printf("SOL Magic Packet received\n");
                     system("sudo shutdown -P 0");
-                    exit_requested = 1;;
+                    exit_requested = 1;
                 }
             }
 
@@ -100,8 +100,6 @@ void wait_for_sol()
 
 void signal_callback_handler(int signum)
 {
-    printf("")
-    
     exit_requested = 1;
     
     cleanup();
