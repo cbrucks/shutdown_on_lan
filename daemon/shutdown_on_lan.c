@@ -13,6 +13,7 @@
 #define PORT 19374
 
 static int exit_requested = 0;
+static unsigned int socket_receive = 0;
 
 int init(void)
 {
@@ -36,8 +37,6 @@ void cleanup(void)
 
 void wait_for_sol()
 {
-	// initialize the socket handle
-	unsigned int socket_receive = 0;
 	char *msg_buf;
 	int msg_buf_len;
 	int bytes_read;
