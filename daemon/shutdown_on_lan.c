@@ -11,6 +11,28 @@
 
 #define PORT 19374
 
+static int exit_requested = 0;
+
+int init(void)
+{
+	// initialize the socket interface
+	if ( !initialize_udp_comm() ) return -1;
+
+	// Create a socket to receive messages on any interface
+	if ( !open_socket( &socket_receive, 0, port_to_net(PORT) ) ) return -1;
+    
+    return 0; // success
+}
+
+void cleanup(void)
+{
+	// Close the sockets
+	if ( !close_socket( &socket_receive ) ) return;
+
+	// Clean up the socket interface
+	if ( !terminate_udp_comm() ) return;
+}
+
 void wait_for_sol()
 {
 	// initialize the socket handle
@@ -36,54 +58,69 @@ void wait_for_sol()
 		*((unsigned int *)(magic_packet+(i*6)+4)) = MAC_WORD_5;
 		*((unsigned int *)(magic_packet+(i*6)+5)) = MAC_WORD_6;
 	}
-	
+    
+    if(init())
+    {
+        // Read the message
+        while ( exit_requested == 0 )
+        {
+            bytes_read = read_message(&socket_receive, &msg_buf, msg_buf_len, 0, 0);
+            
+            if ( bytes_read < 0 ) return;
+            
+            if ( bytes_read > 0 )
+            {
+                //for ( i=0; i < bytes_read; i++ )
+                //	printf("%02X ", 0x000000ff & msg_buf[i]);
+                //printf("\n");
 
-	// initialize the socket interface
-	if ( !initialize_udp_comm() ) return;
+                // verify that the magic packet is for this computer
+                i = strcmp(magic_packet, msg_buf);
+                if ( i == 0 )
+                {
+                    printf("SOL Magic Packet received\n");
+                    system("sudo shutdown -P 0");
+                    break;
+                }
 
-	// Create a socket to receive messages on any interface
-	if ( !open_socket( &socket_receive, 0, port_to_net(PORT) ) ) return;
+                free(msg_buf);
+            }
+        }
+    }
 
-	// Read the message
-	while ( 1 )
-	{
-		bytes_read = read_message(&socket_receive, &msg_buf, msg_buf_len, 0, 0);
-		if ( bytes_read < 0 ) return;
-		if ( bytes_read > 0 )
-		{
-			//for ( i=0; i < bytes_read; i++ )
-			//	printf("%02X ", 0x000000ff & msg_buf[i]);
-			//printf("\n");
-
-			// verify that the magic packet is for this computer
-			i = strcmp(magic_packet, msg_buf);
-			if ( i == 0 )
-			{
-				printf("SOL Magic Packet received\n");
-				system("sudo shutdown -P 0");
-				break;
-			}
-
-			free(msg_buf);
-		}
-	}
-
-	free(magic_packet);
-
-	// Close the sockets
-	if ( !close_socket( &socket_receive ) ) return;
-
-	// Clean up the socket interface
-	if ( !terminate_udp_comm() ) return;
+	cleanup();
+    
+    free(magic_packet);
 
 #if PLATFORM == PLATFORM_WINDOWS
 	system("pause");
 #endif
 }
 
+void signal_callback_handler(int signum)
+{
+    exit_requested = 1;
+    
+    cleanup();
+}
 
 int main()
 {
+    exit_requested = 0;
+    
+    // Register a listener for the termination signal
+    signal(SIGHUP, signal_callback_handler);
+    signal(SIGINT, signal_callback_handler);
+    signal(SIGQUIT, signal_callback_handler);
+    signal(SIGILL, signal_callback_handler);
+    signal(SIGABRT, signal_callback_handler);
+    signal(SIGKILL, signal_callback_handler);
+    signal(SIGTERM, signal_callback_handler);
+    signal(SIGUSR1, signal_callback_handler);
+    signal(SIGUSR2, signal_callback_handler);
+    signal(SIGSTOP, signal_callback_handler);
+    signal(SIGTSTP, signal_callback_handler);
+    
 	wait_for_sol();
 
 	return 0;
