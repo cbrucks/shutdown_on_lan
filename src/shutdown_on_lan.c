@@ -29,10 +29,10 @@ int init(void)
 void cleanup(void)
 {
 	// Close the sockets
-	if ( !close_socket( &socket_receive ) ) return;
+	close_socket( &socket_receive );
 
 	// Clean up the socket interface
-	if ( !terminate_udp_comm() ) return;
+	terminate_udp_comm();
 }
 
 void wait_for_sol()
